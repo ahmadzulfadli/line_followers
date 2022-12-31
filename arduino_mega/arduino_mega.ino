@@ -1,26 +1,28 @@
 // pin driver motor R & L
-int Rrpwm = 23;
-int Rlpwm = 22;
+int Rrpwm = 9;
+int Rlpwm = 8;
 
-int Lrpwm = 19;
-int Llpwm = 18;
-
-int belok = 70;
+int Lrpwm = 11;
+int Llpwm = 10;
 
 // pin sensor 1-5 Line sensor
-int pin_sensor[] = {26, 25, 33, 32, 35};
+int pin_sensor[] = {3, 4, 5, 6, 7};
 int baca_sensor;
 int inp;
 int hasil_baca[] = {0, 0, 0, 0, 0};
 
 // pin sensor 1-2 Ultrasonik sensor
-int echo1 = 12;
-int trig1 = 13;
+int echo1 = 50;
+int trig1 = 48;
 
-int echo2 = 12;
-int trig2 = 13;
+int echo2 = 46;
+int trig2 = 44;
 
 long durasi1, durasi2, jarak1, jarak2;
+
+//led dan buzzer
+int led1 = 40;
+int led2 = 38;
 
 //fungsi membaca sensor
 int readOut(int pin_sensor[])
@@ -63,6 +65,12 @@ void berhenti()
   // motor kiri
   analogWrite(Lrpwm, 0);
   analogWrite(Llpwm, 0);
+  digitalWrite(led1, HIGH);
+  digitalWrite(led2, HIGH);
+  delay(200);
+  digitalWrite(led1, LOW);
+  digitalWrite(led2, LOW);
+  delay(200);
 }
 
 // fungsi belok kanan
@@ -70,22 +78,10 @@ void belok_kanan()
 {
   // motor kanan
   analogWrite(Rrpwm, 0);
-  analogWrite(Rlpwm, 70);
+  analogWrite(Rlpwm, 90);
 
   // motor kiri
   analogWrite(Lrpwm, 152);
-  analogWrite(Llpwm, 0);
-}
-
-void belok_kanan_awal()
-{
-  
-  // motor kanan
-  analogWrite(Rrpwm,0);
-  analogWrite(Rlpwm,50);
-
-  // motor kiri
-  analogWrite(Lrpwm, 120);
   analogWrite(Llpwm, 0);
 }
 
@@ -99,28 +95,18 @@ void belok_kiri()
 
   // motor kiri
   analogWrite(Lrpwm, 0);
-  analogWrite(Llpwm, 70);
+  analogWrite(Llpwm, 90);
 }
-void belok_kiri_awal()
-{
-  // motor kanan
-  analogWrite(Rrpwm, 120);
-  analogWrite(Rlpwm, 0);
-
-  // motor kiri
-  analogWrite(Lrpwm, 0);
-  analogWrite(Llpwm, 50);
-}
-
 void setup()
 {
   Serial.begin(115200);
+
   // mendefinisikan pin motor
   pinMode(Rrpwm, OUTPUT);
   pinMode(Rlpwm, OUTPUT);
   pinMode(Lrpwm, OUTPUT);
   pinMode(Llpwm, OUTPUT);
-
+  
   // mendefinisikan pin sensor line
   int a;
   while (a < 5)
@@ -134,12 +120,16 @@ void setup()
   pinMode(trig1, OUTPUT);
   pinMode(echo2, INPUT);
   pinMode(trig2, OUTPUT);
+
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
 }
 
 void loop()
 {
   // input sensor line
   baca_sensor = readOut(pin_sensor);
+  
   //input sensor ultrasonik
   digitalWrite(trig1, LOW);
   delayMicroseconds(2);
@@ -159,29 +149,20 @@ void loop()
   jarak1 = durasi1 / 58.2;
   jarak2 = durasi2 / 58.2;
 
-
-  // mengatur berhenti dan jalan motor dengan ultrasonik
-  if ((jarak1 < 30) or (jarak2 < 30))
-  {
+  if (jarak1<40 or jarak2<40){
     baca_sensor = 00000;
+  }else{
+    baca_sensor=baca_sensor;
   }
-  else if ((jarak1 > 30) or (jarak2 > 30))
-  {
-    baca_sensor = baca_sensor;
-  }
-
-  // mengatur motor R & L sesuai dengan inputan sensor line
+  
   switch (baca_sensor)
   {
   // hasil baca sensor untuk belok kanan
-  case 11001:
-  case 11101:
-  belok_kanan_awal();
-    break;
   case 11110:
   case 11000:
   case 10000:
   case 11100:
+  case 11101:
     belok_kanan();
     break;
   case 00000:
@@ -191,26 +172,18 @@ void loop()
   // hasil baca sensor untuk arah maju
   case 11011:
   case 10001:
+  case 11001:
+  case 10011:
     maju();
     break;
 
   // hasil baca sensor untuk belok kiri
-  case 10011:
   case 10111:
-    belok_kiri_awal();
-    break;
   case 1111:
   case 111:
   case 11:
   case 1:
     belok_kiri();
     break;
-  default:
-    maju();
-    
-  }
-}
-
-void jarak(){
-  
+  } 
 }
