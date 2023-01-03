@@ -1,3 +1,4 @@
+
 // pin driver motor R & L
 int Rrpwm = 9;
 int Rlpwm = 8;
@@ -45,11 +46,11 @@ int readOut(int pin_sensor[])
 void maju()
 {
   // motor kanan
-  analogWrite(Rrpwm, 252);
+  analogWrite(Rrpwm, 202);
   analogWrite(Rlpwm, 0);
 
   // motor kiri
-  analogWrite(Lrpwm, 255);
+  analogWrite(Lrpwm, 205);
   analogWrite(Llpwm, 0);
   
   
@@ -77,12 +78,12 @@ void berhenti()
 void belok_kanan()
 {
   // motor kanan
-  analogWrite(Rrpwm, 0);
-  analogWrite(Rlpwm, 90);
+  analogWrite(Rrpwm, 132);
+  analogWrite(Rlpwm, 0);
 
   // motor kiri
-  analogWrite(Lrpwm, 152);
-  analogWrite(Llpwm, 0);
+  analogWrite(Lrpwm, 0);
+  analogWrite(Llpwm, 70);
 }
 
 // fungsi belok kiri
@@ -90,12 +91,12 @@ void belok_kiri()
 {
   
   // motor kanan
-  analogWrite(Rrpwm, 152);
-  analogWrite(Rlpwm, 0);
+  analogWrite(Rrpwm, 0);
+  analogWrite(Rlpwm, 132);
 
   // motor kiri
-  analogWrite(Lrpwm, 0);
-  analogWrite(Llpwm, 90);
+  analogWrite(Lrpwm, 70);
+  analogWrite(Llpwm, 0);
 }
 void setup()
 {
@@ -116,8 +117,8 @@ void setup()
   }
 
   // mendefinisikan pin sensor ultrasonik
-  pinMode(echo1, INPUT);
-  pinMode(trig1, OUTPUT);
+//  pinMode(echo1, INPUT);
+//  pinMode(trig1, OUTPUT);
   pinMode(echo2, INPUT);
   pinMode(trig2, OUTPUT);
 
@@ -130,13 +131,13 @@ void loop()
   // input sensor line
   baca_sensor = readOut(pin_sensor);
   
-  //input sensor ultrasonik
-  digitalWrite(trig1, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trig1, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trig1, LOW);
-  durasi1 = pulseIn(echo1, HIGH);
+//  //input sensor ultrasonik
+//  digitalWrite(trig1, LOW);
+//  delayMicroseconds(2);
+//  digitalWrite(trig1, HIGH);
+//  delayMicroseconds(10);
+//  digitalWrite(trig1, LOW);
+//  durasi1 = pulseIn(echo1, HIGH);
 
   digitalWrite(trig2, LOW);
   delayMicroseconds(2);
@@ -144,12 +145,13 @@ void loop()
   delayMicroseconds(10);
   digitalWrite(trig2, LOW);
   durasi2 = pulseIn(echo2, HIGH);
-
-  // perhitungan untuk dijadikan jarak
-  jarak1 = durasi1 / 58.2;
+//
+//  // perhitungan untuk dijadikan jarak
+//  //jarak1 = durasi1 / 58.2;
   jarak2 = durasi2 / 58.2;
-
-  if (jarak1<40 or jarak2<40){
+//
+//
+  if (jarak2<40){
     baca_sensor = 00000;
   }else{
     baca_sensor=baca_sensor;
@@ -158,9 +160,9 @@ void loop()
   switch (baca_sensor)
   {
   // hasil baca sensor untuk belok kanan
+  case 10000:
   case 11110:
   case 11000:
-  case 10000:
   case 11100:
   case 11101:
     belok_kanan();
@@ -178,11 +180,12 @@ void loop()
     break;
 
   // hasil baca sensor untuk belok kiri
+  case 1:
   case 10111:
   case 1111:
   case 111:
   case 11:
-  case 1:
+  
     belok_kiri();
     break;
   } 
